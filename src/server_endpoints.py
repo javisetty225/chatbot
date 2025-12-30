@@ -93,7 +93,7 @@ def register_chatbot_routes(app: FastAPI):
                 detail="Failed to create chat session",
             ) from exc
 
-    @app.post("/chat", response_model=ChatMessageResponse)
+    @app.post("/answer", response_model=ChatMessageResponse)
     def send_chat_message(request: ChatMessageRequest):
         """
         Send a user message to an existing chat session and return the answer.

@@ -7,21 +7,25 @@ name = "chatbot"
 version = "0.1.0"
 description = "Conversational chatbot"
 #readme = "README.md"
-requires-python = "==3.12.10"
+requires-python = ">=3.12.10"
 authors = [
   { name = "Nagaraju Javisetty", email = "nagajavisetty143@gmail.com" }
 ]
 
 dependencies = [
-  # Backend dependencies
+ # Backend dependencies
  "fastapi==0.128.0",
-    "ragflow-sdk== 0.22.1",
-    "uvicorn== 0.40.0"
+ "pytest>=9.0.2",
+ "pytest-mock>=3.15.1",
+ "ragflow-sdk== 0.22.1",
+ "uvicorn== 0.40.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-  "pytest"
+  "pytest",
+    "httpx",
+    "pytest_mock"
 ]
 
 [tool.hatch.build.targets.wheel]
