@@ -6,8 +6,6 @@ from src.server_endpoints import register_chatbot_routes
 import uvicorn
 
 
-
-
 def create_app() -> FastAPI:
     app = FastAPI(
         title="chatbot",
