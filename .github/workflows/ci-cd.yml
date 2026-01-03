@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -76,4 +76,49 @@ jobs:
       - name: Push Docker image
         run: |
           docker push ghcr.io/${{ github.repository }}:latest
+
+  # ---------------- Deployment ----------------
+  deploy:
+    name: Deploy Chatbot via Helm
+    runs-on: ubuntu-latest
+    needs: docker_build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+
+      # ---------------- Kubeconfig ----------------
+      - name: Configure Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG_DATA }}" | base64 --decode > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Update Helm dependencies
+        run: helm dependency update ./helm-chatbot
+
+      - name: Get branch name
+        id: get_branch
+        run: echo "BRANCH_NAME=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+
+      # ---------------- Deploy via Helm ----------------
+      - name: Deploy Chatbot
+        run: |
+          DEPLOYMENT_NAME="chatbot-${{ steps.get_branch.outputs.BRANCH_NAME }}"
+          echo "Deploying with name: $DEPLOYMENT_NAME"
+          helm upgrade --install $DEPLOYMENT_NAME ./helm-chatbot \
+            --set image.repository=ghcr.io/${{ github.repository }} \
+            --set image.tag=latest \
+            --namespace chatbot --create-namespace \
+            --timeout 10m0s --wait
+ 
+
+
  
