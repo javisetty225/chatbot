@@ -1,10 +1,11 @@
 from fastapi.testclient import TestClient
-from src.backend.main import create_app
 from pytest_mock import MockerFixture
 
+from src.backend.main import create_app
 
 client = TestClient(create_app())
 
+STATUS_OK = 200
 
 def test_success_session_creation(mocker: MockerFixture):
     # Mock session
@@ -20,13 +21,13 @@ def test_success_session_creation(mocker: MockerFixture):
 
     # Patch helper function
     mocker.patch(
-        "src.server_endpoints.get_chat_assistant",
+        "src.backend.server_endpoints.get_chat_assistant",
         return_value=mock_assistant,
     )
 
     response = client.post("/session")
 
-    assert response.status_code == 200
+    assert response.status_code == STATUS_OK
 
     data = response.json()
     assert data["session_id"] == "mock-session-id"
@@ -48,11 +49,11 @@ def test_chat_message_success(mocker: MockerFixture):
 
     # Mock assistant
     mock_assistant = mocker.Mock()
-    mock_assistant.list_sessions.return_value = mock_session
+    mock_assistant.list_sessions.return_value = [mock_session]
 
     # Patch assistant getter
     mocker.patch(
-        "src.server_endpoints.get_chat_assistant",
+        "src.backend.server_endpoints.get_chat_assistant",
         return_value=mock_assistant,
     )
 
@@ -64,7 +65,7 @@ def test_chat_message_success(mocker: MockerFixture):
         },
     )
 
-    assert response.status_code == 200
+    assert response.status_code == STATUS_OK
     assert response.json()["answer"] == "This is a mocked answer"
 
 
