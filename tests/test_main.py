@@ -1,10 +1,11 @@
 from fastapi.testclient import TestClient
-from src.backend.main import create_app
 from pytest_mock import MockerFixture
 
+from src.backend.main import create_app
 
 client = TestClient(create_app())
 
+STATUS_OK = 200
 
 def test_success_session_creation(mocker: MockerFixture):
     # Mock session
@@ -26,7 +27,7 @@ def test_success_session_creation(mocker: MockerFixture):
 
     response = client.post("/session")
 
-    assert response.status_code == 200
+    assert response.status_code == STATUS_OK
 
     data = response.json()
     assert data["session_id"] == "mock-session-id"
@@ -64,7 +65,7 @@ def test_chat_message_success(mocker: MockerFixture):
         },
     )
 
-    assert response.status_code == 200
+    assert response.status_code == STATUS_OK
     assert response.json()["answer"] == "This is a mocked answer"
 
 
