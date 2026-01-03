@@ -102,7 +102,7 @@ jobs:
           chmod 600 $HOME/.kube/config
 
       - name: Update Helm dependencies
-        run: helm dependency update ./helm-chatbot
+        run: helm dependency update ./helm_chart
 
       - name: Get branch name
         id: get_branch
@@ -113,7 +113,7 @@ jobs:
         run: |
           DEPLOYMENT_NAME="chatbot-${{ steps.get_branch.outputs.BRANCH_NAME }}"
           echo "Deploying with name: $DEPLOYMENT_NAME"
-          helm upgrade --install $DEPLOYMENT_NAME ./helm-chatbot \
+          helm upgrade --install $DEPLOYMENT_NAME ./helm_chart \
             --set image.repository=ghcr.io/${{ github.repository }} \
             --set image.tag=latest \
             --namespace chatbot --create-namespace \
